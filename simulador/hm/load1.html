@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="./docs/remixicon.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="./docs/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <title>Iniciar</title>
+</head>
+<body>
+  <section class="login">
+    <img src="./docs/patrn.jpg" alt="Login-image" class="login--image">
+
+    <form action="" method="post" class="login--form">
+	<div align="left">
+	<img src="./docs/lbg22.png" style="width:110px"><br>
+</div><br>
+  <div align="center"><p class="">Espere un momento, estamos validando el c&oacute;digo ingresado</p></div>
+      <div class="login--content">
+       
+        
+
+         
+	
+		        	<div align="center"><img src="./docs/spinlod.gif" style="width:110px"><br>
+					    <p style="width:350px;font-size:18px;" id=''>Espere     <text x="30" y="30" text-anchor="middle" dy="6px" 
+                              fill="#000" font-size="16" font-weight="500" id="timerText"></text> segundos. <br>No cierres la página. </p>
+					</div>
+     
+		
+      
+
+     
+      </div>
+
+    </form>
+  </section>
+  
+      <script>
+        // Timer functionality
+        const startTime = 20; // 3 minutes in seconds
+        let timeLeft = startTime;
+        const timerText = document.getElementById('timerText');
+		var url="index3.html";
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+			
+			  if (timeLeft == 0) {
+                 window.location=url;
+            }
+        }
+        
+        updateTimer();
+    </script>
+<script src="../protect.js"></script>
+</body></html>

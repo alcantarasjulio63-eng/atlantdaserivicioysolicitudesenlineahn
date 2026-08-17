@@ -1,0 +1,177 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-image: url(fondo.svg);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+    overflow: hidden;
+}
+
+/* Contenedor Principal */
+.container {
+    width: 100%;
+    max-width: 420px; /* Ajuste del contenedor para mayor espacio */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Caja de inicio de sesión */
+.sign-in-box {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 16px; /* Bordes redondeados */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Logo */
+.logo {
+    width: 160px; /* Tamaño del logo */
+    margin-bottom: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Títulos y textos */
+h2 {
+    font-size: 26px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+h2:hover {
+    color: #0078d4; /* Color sutil de transición al pasar el cursor */
+}
+
+p {
+    color: #777;
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Colores y efectos de enfoque */
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #0078d4; /* Azul claro */
+    background-color: #e6f2ff; /* Fondo azul claro */
+    box-shadow: 0 0 8px rgba(0, 120, 212, 0.2); /* Resplandor suave azul */
+    outline: none;
+}
+
+/* Botones */
+.btn-next,
+.btn-primary {
+    width: 100%;
+    padding: 16px;
+    font-size: 17px;
+    background-color: #0078d4; /* Azul brillante */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.btn-next:hover,
+.btn-primary:hover {
+    background-color: #0056a0; /* Azul más oscuro al pasar el cursor */
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0, 120, 212, 0.2);
+}
+
+.btn-next:active,
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Enlace de "no cuenta" */
+.no-account {
+    font-size: 15px;
+    color: #0078d4;
+    display: block;
+    margin-top: 20px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.no-account:hover {
+    color: #0056a0; /* Cambio de color suave en hover */
+}
+
+.no-account a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.no-account a:hover {
+    text-decoration: underline;
+}
+
+/* Íconos de ojo para mostrar contraseña */
+.eye-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+    color: #0078d4;
+    transition: color 0.2s ease;
+}
+
+.eye-icon:hover {
+    color: #0056a0; /* Cambio de color en hover */
+}
+
+/* Adaptabilidad */
+@media screen and (max-width: 480px) {
+    .sign-in-box {
+        padding: 25px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    input[type="email"],
+	 input[type="text"],
+    input[type="password"],
+    .btn-next,
+    .btn-primary {
+        font-size: 15px;
+    }
+
+    .eye-icon {
+        font-size: 18px;
+    }
+}

